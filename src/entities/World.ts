@@ -13,7 +13,7 @@ export class World {
 
   abundance: number;
   day: number = 0;
-  time = 0;
+  static time = 0;
 
   constructor(canvas: Canvas, abundance: number = 100) {
     this.canvas = canvas;
@@ -36,13 +36,14 @@ export class World {
   }
 
   frame(dt: number) {
-    this.time += dt;
+    World.time += dt;
     this.update(dt);
     this.draw();
   }
 
   update(dt: number) {
     this.creatures.forEach((c) => c.update(dt));
+    this.foods.forEach((f) => f.update());
   }
 
   draw() {

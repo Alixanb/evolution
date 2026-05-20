@@ -34,4 +34,8 @@ export default class Canvas {
   place(vec2: Vec2) {
     return vec2.multiply(this.ratio);
   }
+
+  unplace(vec2: Vec2) {
+    return vec2.divided(this.ratio);
+  }
 }

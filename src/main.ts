@@ -1,14 +1,15 @@
 import { Seeker } from "./core/Species";
-import Vec2 from "./core/Vec2";
 import { World } from "./entities/World";
 import "./style.css";
 import Canvas from "./systems/Canvas";
 import Debug from "./systems/Debug";
+import Inspector from "./systems/Inspector";
 
 const canvas = new Canvas("#canvas");
 const debug = new Debug();
-const world = new World(canvas, 100);
-world.populate(50, Seeker);
+const world = new World(canvas, 3);
+const inspector = new Inspector(canvas, world);
+world.populate(5, Seeker);
 // world.populate(50, Raider);
 world.sow();
 
@@ -19,16 +20,12 @@ function loop(timestamp: number) {
   lastTime = timestamp;
 
   world.frame(dt);
+  inspector.refresh();
 
-  debug.set("time", world.time.toFixed(2));
-  debug.set("position", world.creatures[0].pos.log());
-  debug.set("target", world.creatures[0].target?.pos.log());
-  debug.set("vel", world.creatures[0].vel.log());
+  debug.set("time", World.time.toFixed(2));
   debug.set(
-    "distance",
-    world.creatures[0].pos.distance(
-      world.creatures[0]?.target?.pos || new Vec2(),
-    ),
+    "on",
+    `1: ${world.foods[0].eating.c1 ? "true" : "false"}, \n2: ${world.foods[0].eating.c2 ? "true" : "false"}`,
   );
 
   requestAnimationFrame(loop);
