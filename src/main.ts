@@ -7,9 +7,9 @@ import Inspector from "./systems/Inspector";
 
 const canvas = new Canvas("#canvas");
 const debug = new Debug();
-const world = new World(canvas, 3);
+const world = new World(canvas, 100);
 const inspector = new Inspector(canvas, world);
-world.populate(5, Seeker);
+world.populate(1, Seeker);
 // world.populate(50, Raider);
 world.sow();
 

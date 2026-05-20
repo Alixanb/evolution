@@ -11,7 +11,7 @@ export default class Creature {
   speed = 5;
   target?: Food;
   status: CreatureStatus = "searching";
-  hasFed = false;
+  feedScore = 0;
 
   constructor(species: Species, pos = new Vec2().random(10)) {
     this.species = species;
@@ -29,8 +29,9 @@ export default class Creature {
 
   nextDay() {
     this.status = "searching";
-    this.hasFed = false;
+    this.feedScore = 0;
     this.vel = new Vec2();
+    this.target = undefined;
   }
 
   resetTarget() {

@@ -76,10 +76,20 @@ export class World {
 
   nextDay() {
     this.day += 1;
-    this.foods = [];
-    this.creatures = this.creatures.filter((c) => c.hasFed);
+
+    const survivors: Creature[] = [];
+    for (const c of this.creatures) {
+      if (c.feedScore < 0.25) continue; // dies
+      survivors.push(c);
+      if (c.feedScore >= 0.5) survivors.push(new Creature(c.species));
+      if (c.feedScore >= 0.75) survivors.push(new Creature(c.species));
+    }
+
+    this.creatures = survivors;
     this.creatures.forEach((c) => c.nextDay());
 
+    Food.instances = [];
+    this.foods = [];
     this.sow();
   }
 

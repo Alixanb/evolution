@@ -1,3 +1,4 @@
+import { getDistribution } from "../core/Species";
 import Vec2 from "../core/Vec2";
 import type Creature from "./Creature";
 import { World } from "./World";
@@ -47,9 +48,20 @@ export default class Food {
     if (this.hasBeenEaten) return;
     if (this.eating.since && this.eating.since + this.eatTime < World.time) {
       this.hasBeenEaten = true;
+
+      const c1 = this.eating.c1;
+      const c2 = this.eating.c2;
+
+      if (c1 && c2) {
+        const [s1, s2] = getDistribution(c1.species.type, c2.species.type);
+        c1.feedScore = s1;
+        c2.feedScore = s2;
+      } else if (c1) {
+        c1.feedScore = 1;
+      }
+
       for (const c of this.targeting) {
-        if (c === this.eating.c1 || c === this.eating.c2) {
-          c.hasFed = true;
+        if (c === c1 || c === c2) {
           c.status = "sleeping";
         } else {
           c.resetTarget();
