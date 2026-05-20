@@ -5,6 +5,7 @@ import Food from "./Food";
 
 export class World {
   canvas: Canvas;
+  ctx: CanvasRenderingContext2D;
 
   // instances
   creatures: Creature[] = [];
@@ -12,9 +13,11 @@ export class World {
 
   abundance: number;
   day: number = 0;
+  time = 0;
 
   constructor(canvas: Canvas, abundance: number = 100) {
     this.canvas = canvas;
+    this.ctx = canvas.context;
     this.abundance = abundance;
   }
 
@@ -33,6 +36,7 @@ export class World {
   }
 
   frame(dt: number) {
+    this.time += dt;
     this.update(dt);
     this.draw();
   }
@@ -42,6 +46,13 @@ export class World {
   }
 
   draw() {
+    this.ctx.clearRect(
+      0,
+      0,
+      this.canvas.element.width,
+      this.canvas.element.height,
+    );
+
     this.creatures.forEach((c) =>
       c.draw(this.canvas.context, (v) => this.canvas.place(v)),
     );

@@ -11,6 +11,14 @@ export default class Vec2 {
     return new Vec2(this.x + vec2.x, this.y + vec2.y);
   }
 
+  substract(vec2: Vec2) {
+    return new Vec2(this.x - vec2.x, this.y - vec2.y);
+  }
+
+  bool() {
+    return this.x === 0 && this.y === 0;
+  }
+
   multiply(n: number): Vec2;
   multiply(vec2: Vec2): Vec2;
 
@@ -42,8 +50,18 @@ export default class Vec2 {
     return Math.sqrt((this.x - vec2.x) ** 2 + (this.y - vec2.y) ** 2);
   }
 
+  length() {
+    return Math.sqrt(this.x ** 2 + this.y ** 2);
+  }
+
+  normalize() {
+    const len = this.length();
+    if (len === 0) return new Vec2(0, 0);
+    return new Vec2(this.x / len, this.y / len);
+  }
+
   log() {
-    return `Vec2(${this.x},${this.y})`;
+    return `Vec2(${Math.floor(this.x)},${Math.floor(this.y)})`;
   }
 }
 

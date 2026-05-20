@@ -1,7 +1,13 @@
 import Vec2 from "../core/Vec2";
+import type Creature from "./Creature";
 
 export default class Food {
   static instances: Food[] = [];
+  on: {
+    c1?: Creature;
+    c2?: Creature;
+    since?: number;
+  } = {};
   pos: Vec2;
 
   constructor() {
@@ -31,5 +37,7 @@ export default class Food {
         nearestDistance = distance;
       }
     });
+
+    return nearest;
   }
 }
