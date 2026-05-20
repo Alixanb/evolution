@@ -31,11 +31,15 @@ export default class Vec2 {
     return new Vec2(this.x / arg, this.y / arg);
   }
 
-  random() {
+  random(padding = 0) {
     return new Vec2(
-      Math.floor(Math.random() * GRID_SIZE.x),
-      Math.floor(Math.random() * GRID_SIZE.y),
+      Math.floor(Math.random() * (GRID_SIZE.x - padding * 2) + padding),
+      Math.floor(Math.random() * (GRID_SIZE.y - padding * 2) + padding),
     );
+  }
+
+  distance(vec2: Vec2) {
+    return Math.sqrt((this.x - vec2.x) ** 2 + (this.y - vec2.y) ** 2);
   }
 
   log() {

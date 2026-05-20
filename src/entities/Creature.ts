@@ -6,7 +6,7 @@ export default class Creature {
   pos: Vec2 = new Vec2();
   vel: Vec2 = new Vec2();
 
-  constructor(species: Species, pos = new Vec2().random()) {
+  constructor(species: Species, pos = new Vec2().random(10)) {
     this.species = species;
     this.pos = pos;
   }
