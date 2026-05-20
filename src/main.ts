@@ -23,10 +23,7 @@ function loop(timestamp: number) {
   inspector.refresh();
 
   debug.set("time", World.time.toFixed(2));
-  debug.set(
-    "on",
-    `1: ${world.foods[0].eating.c1 ? "true" : "false"}, \n2: ${world.foods[0].eating.c2 ? "true" : "false"}`,
-  );
+  debug.set("day", world.day);
 
   requestAnimationFrame(loop);
 }

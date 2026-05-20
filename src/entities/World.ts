@@ -10,6 +10,8 @@ export class World {
   // instances
   creatures: Creature[] = [];
   foods: Food[] = [];
+  lastDayCheck = -1;
+  checkEvery = 1;
 
   abundance: number;
   day: number = 0;
@@ -39,11 +41,46 @@ export class World {
     World.time += dt;
     this.update(dt);
     this.draw();
+
+    if (this.lastDayCheck + this.checkEvery < World.time) {
+      // check
+      this.lastDayCheck = World.time;
+      if (this.isDayEnded()) {
+        this.nextDay();
+      }
+    }
   }
 
   update(dt: number) {
     this.creatures.forEach((c) => c.update(dt));
     this.foods.forEach((f) => f.update());
+  }
+
+  isDayEnded() {
+    let foodRemaining = false;
+    for (let food of this.foods) {
+      if (!food.hasBeenEaten) {
+        foodRemaining = true;
+      }
+    }
+
+    let allCreaturesSleep = true;
+    for (let creature of this.creatures) {
+      if (creature.status !== "sleeping") {
+        allCreaturesSleep = false;
+      }
+    }
+
+    return !foodRemaining || allCreaturesSleep;
+  }
+
+  nextDay() {
+    this.day += 1;
+    this.foods = [];
+    this.creatures = this.creatures.filter((c) => c.hasFed);
+    this.creatures.forEach((c) => c.nextDay());
+
+    this.sow();
   }
 
   draw() {

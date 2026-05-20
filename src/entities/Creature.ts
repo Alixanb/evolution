@@ -2,7 +2,7 @@ import type Species from "../core/Species";
 import Vec2 from "../core/Vec2";
 import Food from "./Food";
 
-type CreatureStatus = "searching" | "walking" | "eating";
+export type CreatureStatus = "searching" | "walking" | "eating" | "sleeping";
 
 export default class Creature {
   species: Species;
@@ -11,6 +11,7 @@ export default class Creature {
   speed = 5;
   target?: Food;
   status: CreatureStatus = "searching";
+  hasFed = false;
 
   constructor(species: Species, pos = new Vec2().random(10)) {
     this.species = species;
@@ -18,31 +19,45 @@ export default class Creature {
   }
 
   seek(food: Food) {
+    if (this.target) {
+      const idx = this.target.targeting.indexOf(this);
+      if (idx !== -1) this.target.targeting.splice(idx, 1);
+    }
     this.target = food;
-    this.target.targeting.push(this);
+    food.targeting.push(this);
   }
 
-  stopSeeking() {
-    const index = this.target?.targeting.indexOf(this);
+  nextDay() {
+    this.status = "searching";
+    this.hasFed = false;
+    this.vel = new Vec2();
+  }
 
-    if (index) {
-      this.target?.targeting.splice(index, 1);
+  resetTarget() {
+    if (this.target) {
+      const idx = this.target.targeting.indexOf(this);
+      if (idx !== -1) this.target.targeting.splice(idx, 1);
+      this.target = undefined;
     }
+    this.vel = new Vec2();
+    this.status = "searching";
   }
 
   update(dt: number) {
     switch (this.status) {
-      case "searching":
-        if (!this.target) this.seek(Food.nearest(this.pos));
-        this.startMoving();
+      case "searching": {
+        const food = Food.nearest(this.pos);
+        if (food) {
+          this.seek(food);
+          this.startMoving();
+        }
         break;
+      }
       case "walking":
         if (this.isAtDestination()) {
-          if (!this.target) return;
-
           this.vel = new Vec2();
           this.status = "eating";
-          this.target.eat(this);
+          this.target!.eat(this);
         }
         break;
     }
@@ -50,23 +65,15 @@ export default class Creature {
     this.pos = this.pos.add(this.vel.multiply(dt));
   }
 
-  startMoving() {
+  private startMoving() {
     this.status = "walking";
-
-    if (!this.target) return;
-
-    this.vel = this.target?.pos
-      .substract(this.pos)
+    this.vel = this.target!.pos.substract(this.pos)
       .normalize()
       .multiply(this.speed);
   }
 
-  isAtDestination() {
-    if (!this.target) return;
-
-    if (this.pos.distance(this.target.pos) < 1) {
-      return true;
-    }
+  private isAtDestination() {
+    return !!this.target && this.pos.distance(this.target.pos) < 1;
   }
 
   draw(ctx: CanvasRenderingContext2D, place: (vec2: Vec2) => Vec2) {

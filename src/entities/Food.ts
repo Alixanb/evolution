@@ -10,13 +10,53 @@ export default class Food {
     c2?: Creature;
     since?: number;
   } = {};
-  eatTime = 5;
+  eatTime = 0.5;
   targeting: Creature[] = [];
   pos: Vec2;
 
   constructor() {
     this.pos = new Vec2().random(5);
     Food.instances.push(this);
+  }
+
+  get isFull() {
+    return !!(this.eating.c1 && this.eating.c2);
+  }
+
+  eat(creature: Creature) {
+    if (this.hasBeenEaten) {
+      creature.resetTarget();
+      return;
+    }
+    if (!this.eating.c1) {
+      this.eating.c1 = creature;
+      this.eating.since = World.time;
+    } else if (!this.eating.c2) {
+      this.eating.c2 = creature;
+      // food is now full — redirect everyone else
+      this.targeting
+        .filter((c) => c !== this.eating.c1 && c !== this.eating.c2)
+        .forEach((c) => c.resetTarget());
+      this.targeting = [this.eating.c1, this.eating.c2];
+    } else {
+      creature.resetTarget();
+    }
+  }
+
+  update() {
+    if (this.hasBeenEaten) return;
+    if (this.eating.since && this.eating.since + this.eatTime < World.time) {
+      this.hasBeenEaten = true;
+      for (const c of this.targeting) {
+        if (c === this.eating.c1 || c === this.eating.c2) {
+          c.hasFed = true;
+          c.status = "sleeping";
+        } else {
+          c.resetTarget();
+        }
+      }
+      this.targeting = [];
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D, place: (vec2: Vec2) => Vec2) {
@@ -33,44 +73,28 @@ export default class Food {
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // highlight
     ctx.beginPath();
+    ctx.arc(p.x - 1, p.y - 1, 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.45)";
+    ctx.fill();
   }
 
-  update() {
-    if (this.eating.since && this.eating.since + this.eatTime < World.time) {
-      this.hasBeenEaten = true;
+  static nearest(from: Vec2): Food | undefined {
+    const available = Food.instances.filter(
+      (f) => !f.hasBeenEaten && !f.isFull,
+    );
+    if (!available.length) return undefined;
 
-      this.targeting.forEach((c) => {
-        c.target = undefined;
-      });
-    }
-  }
+    let nearest = available[0];
+    let nearestDist = nearest.pos.distance(from);
 
-  eat(creature: Creature) {
-    if (!this.eating.c1) {
-      this.eating.c1 = creature;
-      this.eating.since = World.time;
-    } else if (!this.eating.c2) {
-      this.eating.c2 = creature;
-    } else {
-      creature.target = Food.nearest(creature.pos);
-    }
-  }
-
-  static nearest(from: Vec2) {
-    let nearest = this.instances[0];
-    let nearestDistance = this.instances[0].pos.distance(from);
-
-    this.instances.forEach((f, i) => {
-      if (i === 0) return;
-
-      const distance = f.pos.distance(from);
-      if (distance < nearestDistance && !f.eating.c2) {
-        nearest = f;
-        nearestDistance = distance;
+    for (let i = 1; i < available.length; i++) {
+      const d = available[i].pos.distance(from);
+      if (d < nearestDist) {
+        nearest = available[i];
+        nearestDist = d;
       }
-    });
+    }
 
     return nearest;
   }
