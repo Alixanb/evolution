@@ -1,7 +1,7 @@
 import Vec2 from "../core/Vec2";
 
 export default class Food {
-  static instances: Food[];
+  static instances: Food[] = [];
   pos: Vec2;
 
   constructor() {
@@ -13,7 +13,7 @@ export default class Food {
     const ctxPos = place(this.pos);
 
     ctx.beginPath();
-    ctx.arc(ctxPos.x, ctxPos.y, 10, 0, Math.PI * 2);
+    ctx.arc(ctxPos.x, ctxPos.y, 3, 0, Math.PI * 2);
     ctx.fillStyle = "rgb(27, 133, 25)";
     ctx.fill();
   }

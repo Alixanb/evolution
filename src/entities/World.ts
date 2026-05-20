@@ -1,13 +1,29 @@
 import Species, { Seeker } from "../core/Species";
 import type Canvas from "../systems/Canvas";
 import Creature from "./Creature";
+import Food from "./Food";
 
 export class World {
   canvas: Canvas;
-  creatures: Creature[] = [];
 
-  constructor(canvas: Canvas) {
+  // instances
+  creatures: Creature[] = [];
+  foods: Food[] = [];
+
+  abundance: number;
+  day: number = 0;
+
+  constructor(canvas: Canvas, abundance: number = 100) {
     this.canvas = canvas;
+    this.abundance = abundance;
+  }
+
+  sow() {
+    this.foods = [];
+
+    for (let i = 0; i < this.abundance; i++) {
+      this.foods.push(new Food());
+    }
   }
 
   populate(n: number, species: Species = Seeker) {
@@ -28,6 +44,10 @@ export class World {
   draw() {
     this.creatures.forEach((c) =>
       c.draw(this.canvas.context, (v) => this.canvas.place(v)),
+    );
+
+    this.foods.forEach((f) =>
+      f.draw(this.canvas.context, (v) => this.canvas.place(v)),
     );
   }
 }

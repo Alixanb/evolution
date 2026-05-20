@@ -5,8 +5,9 @@ import Canvas from "./systems/Canvas";
 
 const canvas = new Canvas("#canvas");
 const world = new World(canvas);
-world.populate(100, Seeker);
-world.populate(100, Raider);
+world.populate(50, Seeker);
+world.populate(50, Raider);
+world.sow();
 
 let lastTime = 0;
 
