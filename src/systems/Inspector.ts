@@ -8,6 +8,7 @@ type Entity = Creature | Food;
 
 export default class Inspector {
   private panel: HTMLElement;
+  private bodyEl: HTMLElement;
   private selected: Entity | null = null;
   private world: World;
   private canvas: Canvas;
@@ -15,31 +16,22 @@ export default class Inspector {
   constructor(canvas: Canvas, world: World) {
     this.canvas = canvas;
     this.world = world;
-    this.panel = this.buildPanel();
+    const { panel, body } = this.buildPanel();
+    this.panel = panel;
+    this.bodyEl = body;
     canvas.element.addEventListener("click", (e) => this.pick(e));
   }
 
-  private buildPanel(): HTMLElement {
-    const el = document.createElement("div");
-    Object.assign(el.style, {
-      position: "fixed",
-      bottom: "12px",
-      right: "12px",
-      background: "rgba(10,10,20,0.85)",
-      color: "#d0d0d0",
-      fontFamily: "monospace",
-      fontSize: "12px",
-      padding: "10px 14px",
-      borderRadius: "6px",
-      lineHeight: "2",
-      pointerEvents: "none",
-      zIndex: "9999",
-      minWidth: "200px",
-      display: "none",
-      borderTop: "2px solid #555",
-    });
-    document.body.appendChild(el);
-    return el;
+  private buildPanel(): { panel: HTMLElement; body: HTMLElement } {
+    const panel = document.createElement("div");
+    panel.className = "inspector-panel";
+
+    const body = document.createElement("div");
+    body.className = "inspector-body";
+
+    panel.appendChild(body);
+    document.body.appendChild(panel);
+    return { panel, body };
   }
 
   private pick(e: MouseEvent) {
@@ -51,44 +43,45 @@ export default class Inspector {
 
     for (const c of this.world.creatures) {
       const d = c.pos.distance(click);
-      if (d < bestDist) {
-        best = c;
-        bestDist = d;
-      }
+      if (d < bestDist) { best = c; bestDist = d; }
     }
 
     for (const f of this.world.foods) {
       if (f.hasBeenEaten) continue;
       const d = f.pos.distance(click);
-      if (d < bestDist) {
-        best = f;
-        bestDist = d;
-      }
+      if (d < bestDist) { best = f; bestDist = d; }
     }
 
     this.selected = best;
+    this.world.highlighted = best instanceof Creature ? best : null;
     if (!best) this.panel.style.display = "none";
   }
 
   refresh() {
+    if (this.world.highlighted && !this.world.creatures.includes(this.world.highlighted)) {
+      this.world.highlighted = null;
+      this.selected = null;
+      this.panel.style.display = "none";
+      return;
+    }
     if (!this.selected) return;
 
     this.panel.style.display = "block";
     if (this.selected instanceof Creature) {
-      this.panel.style.borderTopColor = this.selected.species.color;
-      this.panel.innerHTML = this.renderCreature(this.selected);
+      this.panel.style.boxShadow = `4px 4px 0 ${this.selected.species.color}`;
+      this.bodyEl.innerHTML = this.renderCreature(this.selected);
     } else {
-      this.panel.style.borderTopColor = "rgb(27, 133, 25)";
-      this.panel.innerHTML = this.renderFood(this.selected);
+      this.panel.style.boxShadow = `4px 4px 0 #6cb973`;
+      this.bodyEl.innerHTML = this.renderFood(this.selected);
     }
   }
 
   private row(label: string, value: unknown) {
-    return `<div><span style="opacity:0.45;width:60px;display:inline-block">${label}</span>${value}</div>`;
+    return `<div class="inspector-row"><span class="inspector-key">${label}</span><span>${value}</span></div>`;
   }
 
   private header(label: string, color: string) {
-    return `<div style="color:${color};font-weight:bold;margin-bottom:4px;letter-spacing:1px">${label.toUpperCase()}</div>`;
+    return `<div class="inspector-header" style="color:${color}">${label.toUpperCase()}</div>`;
   }
 
   private renderCreature(c: Creature) {
@@ -104,7 +97,7 @@ export default class Inspector {
 
   private renderFood(f: Food) {
     return [
-      this.header("food", "rgb(27, 133, 25)"),
+      this.header("food", "#6cb973"),
       this.row("pos", f.pos.log()),
       this.row("eaten", f.hasBeenEaten),
       this.row("c1", f.eating.c1?.species.name ?? "—"),
