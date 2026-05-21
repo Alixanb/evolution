@@ -1,10 +1,17 @@
-export type SpeciesType = "seeker" | "raider";
+export type SpeciesType = "seeker" | "raider" | "swift" | "titan";
 
-// keys are in alphabetical sort order (raider < seeker)
+// feedScore: 0 → death  0.25 → 50% survive  0.5 → survive  0.75 → survive + 50% repro  1 → survive + repro
 const distributionMap: Record<string, [number, number]> = {
-  "raider|raider": [0, 0],
-  "raider|seeker": [0.75, 0.25], // raider gets 0.75, seeker gets 0.25
-  "seeker|seeker": [0.5, 0.5],
+  "raider|raider":  [0,    0   ],
+  "raider|seeker":  [0.75, 0.25],
+  "raider|swift":   [0.25, 0.75],
+  "raider|titan":   [0,    1   ],
+  "seeker|seeker":  [0.5,  0.5 ],
+  "seeker|swift":   [0.5,  0.5 ],
+  "seeker|titan":   [0.25, 0.75],
+  "swift|swift":    [0.5,  0.5 ],
+  "swift|titan":    [0.25, 0.75],
+  "titan|titan":    [0,    0   ],
 };
 
 export function getDistribution(
@@ -21,14 +28,18 @@ export default class Species {
   color: string;
   speed: number;
   type: SpeciesType;
+  desc: string;
 
-  constructor(name: string, color: string, speed: number, type: SpeciesType) {
+  constructor(name: string, color: string, speed: number, type: SpeciesType, desc: string) {
     this.name = name;
     this.color = color;
     this.speed = speed;
     this.type = type;
+    this.desc = desc;
   }
 }
 
-export const Seeker = new Species("seekers", "rgb(58, 149, 232)", 1, "seeker");
-export const Raider = new Species("raider", "rgb(232, 58, 68)", 1, "raider");
+export const Seeker = new Species("seeker", "#50b6c9", 5, "seeker", "Shares food. Loses to raiders & titans.");
+export const Raider = new Species("raider", "#ec2626", 5, "raider", "Steals food. Beats seekers, loses to titans.");
+export const Swift  = new Species("swift",  "#e9d628", 8, "swift",  "Fastest. Beats seekers, resists raiders.");
+export const Titan  = new Species("titan",  "#b77be8", 3, "titan",  "Dominant but sterile with other titans.");

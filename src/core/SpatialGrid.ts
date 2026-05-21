@@ -39,11 +39,6 @@ export default class SpatialGrid<T extends { pos: Vec2 }> {
     if (i !== -1) cell.splice(i, 1);
   }
 
-  /**
-   * Returns the nearest item passing `filter`, searching outward in cell rings.
-   * Stops as soon as the minimum possible distance to the next ring exceeds
-   * the best distance found — guaranteed correct, typically O(k) with k ≪ n.
-   */
   nearest(from: Vec2, filter?: (item: T) => boolean): T | undefined {
     const [cx, cy] = this.cellOf(from);
     const maxR = Math.max(this.cols, this.rows);
@@ -52,14 +47,10 @@ export default class SpatialGrid<T extends { pos: Vec2 }> {
     let bestDist = Infinity;
 
     for (let r = 0; r <= maxR; r++) {
-      // Minimum possible distance from `from` to any point in ring r:
-      // cells in ring r are at grid distance r, so their nearest edge is
-      // at least (r-1)*cellSize away (creature may be at far edge of its cell).
       if (r > 1 && (r - 1) * this.cellSize > bestDist) break;
 
       for (let dx = -r; dx <= r; dx++) {
         for (let dy = -r; dy <= r; dy++) {
-          // Only ring boundary, skip interior
           if (Math.abs(dx) < r && Math.abs(dy) < r) continue;
 
           const nx = cx + dx;
