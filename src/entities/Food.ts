@@ -1,5 +1,5 @@
-import { getDistribution } from "../core/Species";
 import SpatialGrid from "../core/SpatialGrid";
+import { getDistribution } from "../core/Species";
 import Vec2, { GRID_SIZE } from "../core/Vec2";
 import type Creature from "./Creature";
 import { World } from "./World";
@@ -13,7 +13,7 @@ export default class Food {
     c2?: Creature;
     since?: number;
   } = {};
-  eatTime = 0.5;
+  eatTime = 2;
   targeting: Creature[] = [];
   pos: Vec2;
 
@@ -78,20 +78,10 @@ export default class Food {
     if (this.hasBeenEaten) return;
 
     const p = place(this.pos);
-    const r = 4;
+    const half = 4;
 
-    ctx.shadowColor = "rgb(60, 220, 60)";
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-    ctx.fillStyle = "rgb(35, 170, 35)";
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    ctx.beginPath();
-    ctx.arc(p.x - 1, p.y - 1, 1.2, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255,255,255,0.45)";
-    ctx.fill();
+    ctx.fillStyle = "#6cb973";
+    ctx.fillRect(p.x - half, p.y - half, half * 2, half * 2);
   }
 
   static nearest(from: Vec2): Food | undefined {

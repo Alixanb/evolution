@@ -8,7 +8,7 @@ export default class Creature {
   species: Species;
   pos: Vec2 = new Vec2();
   vel: Vec2 = new Vec2();
-  speed = 5;
+  speed: number;
   target?: Food;
   status: CreatureStatus = "searching";
   feedScore = 0;
@@ -16,6 +16,7 @@ export default class Creature {
   constructor(species: Species, pos = new Vec2().random(10)) {
     this.species = species;
     this.pos = pos;
+    this.speed = species.speed;
   }
 
   seek(food: Food) {
@@ -64,6 +65,8 @@ export default class Creature {
           this.vel = new Vec2();
           this.status = "eating";
           this.target!.eat(this);
+        } else {
+          this.vel = this.target!.pos.substract(this.pos).normalize().multiply(this.speed);
         }
         break;
     }
@@ -82,19 +85,36 @@ export default class Creature {
     return !!this.target && this.pos.distance(this.target.pos) < 1;
   }
 
-  draw(ctx: CanvasRenderingContext2D, place: (vec2: Vec2) => Vec2) {
+  draw(ctx: CanvasRenderingContext2D, place: (vec2: Vec2) => Vec2, selected = false) {
     const p = place(this.pos);
     const r = 7;
 
-    ctx.shadowColor = this.species.color;
-    ctx.shadowBlur = 14;
+    if (selected) {
+      const s = r + 6;
+      const blen = 5;
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,0.85)";
+      ctx.lineWidth = 1.5;
+      for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as [number, number][]) {
+        const bx = p.x + sx * s;
+        const by = p.y + sy * s;
+        ctx.beginPath();
+        ctx.moveTo(bx + sx * blen, by);
+        ctx.lineTo(bx, by);
+        ctx.lineTo(bx, by + sy * blen);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    ctx.save();
+    if (this.status === "sleeping") ctx.globalAlpha = 0.4;
+
     ctx.beginPath();
     ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
     ctx.fillStyle = this.species.color;
     ctx.fill();
-    ctx.shadowBlur = 0;
 
-    // direction arrow
     const speed = this.vel.length();
     if (speed > 0.01) {
       const angle = Math.atan2(this.vel.y, this.vel.x);
@@ -111,10 +131,6 @@ export default class Creature {
       ctx.fill();
     }
 
-    // inner highlight
-    ctx.beginPath();
-    ctx.arc(p.x - 2, p.y - 2, 2, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255,255,255,0.35)";
-    ctx.fill();
+    ctx.restore();
   }
 }
