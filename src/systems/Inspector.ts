@@ -73,14 +73,14 @@ export default class Inspector {
   refresh() {
     if (!this.selected) return;
 
-    const isCreature = this.selected instanceof Creature;
-    this.panel.style.borderTopColor = isCreature
-      ? this.selected.species.color
-      : "rgb(27, 133, 25)";
     this.panel.style.display = "block";
-    this.panel.innerHTML = isCreature
-      ? this.renderCreature(this.selected)
-      : this.renderFood(this.selected as Food);
+    if (this.selected instanceof Creature) {
+      this.panel.style.borderTopColor = this.selected.species.color;
+      this.panel.innerHTML = this.renderCreature(this.selected);
+    } else {
+      this.panel.style.borderTopColor = "rgb(27, 133, 25)";
+      this.panel.innerHTML = this.renderFood(this.selected);
+    }
   }
 
   private row(label: string, value: unknown) {

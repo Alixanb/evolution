@@ -1,16 +1,17 @@
-import { Seeker } from "./core/Species";
+import { Raider, Seeker } from "./core/Species";
 import { World } from "./entities/World";
 import "./style.css";
 import Canvas from "./systems/Canvas";
-import Debug from "./systems/Debug";
+import ControlPanel from "./systems/ControlPanel";
 import Inspector from "./systems/Inspector";
 
 const canvas = new Canvas("#canvas");
-const debug = new Debug();
 const world = new World(canvas, 100);
 const inspector = new Inspector(canvas, world);
-world.populate(1, Seeker);
-// world.populate(50, Raider);
+const panel = new ControlPanel(world);
+
+world.populate(10, Seeker);
+world.populate(10, Raider);
 world.sow();
 
 let lastTime = 0;
@@ -19,11 +20,12 @@ function loop(timestamp: number) {
   const dt = (timestamp - lastTime) / 1000;
   lastTime = timestamp;
 
-  world.frame(dt);
-  inspector.refresh();
+  if (!panel.paused) {
+    world.frame(dt * panel.speed);
+  }
 
-  debug.set("time", World.time.toFixed(2));
-  debug.set("day", world.day);
+  inspector.refresh();
+  panel.refresh(World.time);
 
   requestAnimationFrame(loop);
 }

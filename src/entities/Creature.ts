@@ -54,6 +54,11 @@ export default class Creature {
         }
         break;
       }
+      case "eating":
+        if (!this.target || this.target.hasBeenEaten) {
+          this.status = "sleeping";
+        }
+        break;
       case "walking":
         if (this.isAtDestination()) {
           this.vel = new Vec2();

@@ -1,10 +1,12 @@
 import { getDistribution } from "../core/Species";
-import Vec2 from "../core/Vec2";
+import SpatialGrid from "../core/SpatialGrid";
+import Vec2, { GRID_SIZE } from "../core/Vec2";
 import type Creature from "./Creature";
 import { World } from "./World";
 
 export default class Food {
   static instances: Food[] = [];
+  static grid = new SpatialGrid<Food>(GRID_SIZE.x, GRID_SIZE.y);
   hasBeenEaten = false;
   eating: {
     c1?: Creature;
@@ -18,6 +20,7 @@ export default class Food {
   constructor() {
     this.pos = new Vec2().random(5);
     Food.instances.push(this);
+    Food.grid.insert(this);
   }
 
   get isFull() {
@@ -48,6 +51,7 @@ export default class Food {
     if (this.hasBeenEaten) return;
     if (this.eating.since && this.eating.since + this.eatTime < World.time) {
       this.hasBeenEaten = true;
+      Food.grid.remove(this);
 
       const c1 = this.eating.c1;
       const c2 = this.eating.c2;
@@ -60,12 +64,11 @@ export default class Food {
         c1.feedScore = 1;
       }
 
+      if (c1) c1.status = "sleeping";
+      if (c2) c2.status = "sleeping";
+
       for (const c of this.targeting) {
-        if (c === c1 || c === c2) {
-          c.status = "sleeping";
-        } else {
-          c.resetTarget();
-        }
+        if (c !== c1 && c !== c2) c.resetTarget();
       }
       this.targeting = [];
     }
@@ -92,22 +95,6 @@ export default class Food {
   }
 
   static nearest(from: Vec2): Food | undefined {
-    const available = Food.instances.filter(
-      (f) => !f.hasBeenEaten && !f.isFull,
-    );
-    if (!available.length) return undefined;
-
-    let nearest = available[0];
-    let nearestDist = nearest.pos.distance(from);
-
-    for (let i = 1; i < available.length; i++) {
-      const d = available[i].pos.distance(from);
-      if (d < nearestDist) {
-        nearest = available[i];
-        nearestDist = d;
-      }
-    }
-
-    return nearest;
+    return Food.grid.nearest(from, (f) => !f.isFull);
   }
 }
