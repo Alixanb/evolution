@@ -2,12 +2,63 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Evolution</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>Evolution — Digital Ecosystem & Creature Simulation</title>
+    <meta name="title" content="Evolution — Digital Ecosystem & Creature Simulation" />
+    <meta name="description" content="An interactive 2D evolution simulation. Watch Seekers and Raiders navigate a digital ecosystem, compete for food, and evolve through generations." />
+    <meta name="keywords" content="evolution simulation, digital ecosystem, artificial life, creature simulation, biology sim, browser game, genetic algorithm, seeker raider" />
+    <meta name="author" content="Evolution Team" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://evolution-sim.netlify.app/" />
+    <meta property="og:title" content="Evolution — Digital Ecosystem & Creature Simulation" />
+    <meta property="og:description" content="Interactive 2D simulation of biological evolution. Features complex behaviors, population dynamics, and real-time inspector." />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:url" content="https://evolution-sim.netlify.app/" />
+    <meta property="twitter:title" content="Evolution — Digital Ecosystem & Creature Simulation" />
+    <meta property="twitter:description" content="Interactive 2D simulation of biological evolution. Features complex behaviors, population dynamics, and real-time inspector." />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
   </head>
   <body>
     <div id="noise"></div>
+    
+    <!-- SEO Content (Hidden from view but visible to crawlers) -->
+    <main style="display: none;" aria-hidden="true">
+      <h1>Evolution: A Biological Simulation</h1>
+      <p>
+        Evolution is an interactive digital ecosystem where artificial life forms compete for resources and survive through generations. 
+        This simulation models the fundamental principles of biological evolution in a simplified 2D environment.
+      </p>
+      
+      <h2>Core Simulation Features</h2>
+      <ul>
+        <li><strong>Day-based Simulation:</strong> Creatures hunt for food, eat, and rest in a rhythmic cycle.</li>
+        <li><strong>Population Dynamics:</strong> Real-time reproduction and mortality based on food consumption (feedScore).</li>
+        <li><strong>Species Diversity:</strong> 
+          <ul>
+            <li><em>Seekers:</em> Efficient foragers that locate food quickly.</li>
+            <li><em>Raiders:</em> Opportunistic creatures that steal resources from others.</li>
+          </ul>
+        </li>
+        <li><strong>Spatial Optimization:</strong> Utilizes a SpatialGrid for efficient O(1) food lookup, allowing hundreds of creatures simultaneously.</li>
+        <li><strong>Real-time Analytics:</strong> Monitor population graphs, species distribution, and individual creature statistics.</li>
+      </ul>
+
+      <h2>How It Works</h2>
+      <p>
+        Every "day" in the simulation, a fixed amount of food is spawned across the grid. Creatures must find and consume at least one unit of food to survive. 
+        Consuming more food increases the chance of reproduction. The simulation handles complex interactions like food sharing and resource theft, 
+        leading to emergent behaviors and shifting population balances.
+      </p>
+    </main>
+
     <div id="landing"></div>
     <div id="hud"></div>
     <canvas id="canvas"></canvas>
