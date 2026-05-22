@@ -91,9 +91,17 @@ export default class LandingScreen {
     btn.className = "btn-start";
     btn.textContent = "Start Simulation";
 
+    const footer = document.createElement("div");
+    footer.className = "landing-footer";
+    footer.innerHTML = `
+      <span class="footer-label">More Projects</span>
+      <a href="https://galaxy.alixan.dev/" target="_blank" class="footer-link">Galaxy Simulation</a>
+    `;
+
     body.appendChild(panelLabel);
     body.appendChild(grid);
     body.appendChild(btn);
+    body.appendChild(footer);
     panel.appendChild(body);
 
     this.el.appendChild(left);
